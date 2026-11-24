@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — CBHS Bank</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo-link">
+        <img src="/images/casco-bay-logo.png" alt="Casco Bay High School logo">
+        <div class="logo-text">
+          Casco Bay High School
+          <span>Bank</span>
+        </div>
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/accounts" class="active">Accounts</a></li>
+          <li><a href="/new-account">Open account</a></li>
+          <li><a href="/transfer">Transfer</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Accounts</h1>
+        <p class="lead">Search is case-sensitive. “Rob” matches Robotics Club; “rob” does not.</p>
+      </div>
+
+      <form id="search-form" class="toolbar">
+        <label for="name">Owner name</label>
+        <input id="name" name="name" type="text" placeholder="Robotics">
+        <button type="submit" class="btn">Search</button>
+        <button type="button" id="clear" class="btn btn-outline">Show all</button>
+      </form>
+
+      <p id="status" class="alert" hidden></p>
+      <p id="empty" class="scaffold-message" hidden>No accounts match.</p>
+
+      <table class="data-table" id="table" hidden>
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Owner</th>
+            <th>Type</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <p><strong>Casco Bay High School</strong></p>
+        <p><a href="https://cbhsstem.org">cbhsstem.org</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/format.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    async function loadAccounts(name) {
+      var status = document.getElementById("status");
+      showMessage(status, "", false);
+      var path = "/api/accounts";
+      if (name) {
+        path += "?name=" + encodeURIComponent(name);
+      }
+      try {
+        var data = await apiGet(path);
+        render(data.accounts);
+      } catch (err) {
+        showMessage(status, err.message, true);
+      }
+    }
+
+    function render(accounts) {
+      var table = document.getElementById("table");
+      var empty = document.getElementById("empty");
+      var rows = document.getElementById("rows");
+      rows.innerHTML = "";
+      if (!accounts || accounts.length === 0) {
+        table.hidden = true;
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      table.hidden = false;
+      accounts.forEach(function (account) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><a href=\"/account?number=" + account.accountNumber + "\">" + account.accountNumber + "</a></td>" +
+          "<td>" + account.ownerName + "</td>" +
+          "<td>" + typeLabel(account.accountType) + "</td>" +
+          "<td class=\"money\">" + money(account.balance) + "</td>";
+        rows.appendChild(tr);
+      });
+    }
+
+    document.getElementById("search-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      loadAccounts(document.getElementById("name").value);
+    });
+    document.getElementById("clear").addEventListener("click", function () {
+      document.getElementById("name").value = "";
+      loadAccounts("");
+    });
+    loadAccounts("");
+  </script>
+</body>
+</html>

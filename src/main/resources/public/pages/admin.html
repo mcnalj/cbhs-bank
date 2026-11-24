@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — CBHS Bank</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo-link">
+        <img src="/images/casco-bay-logo.png" alt="Casco Bay High School logo">
+        <div class="logo-text">
+          Casco Bay High School
+          <span>Bank</span>
+        </div>
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/accounts">Accounts</a></li>
+          <li><a href="/new-account">Open account</a></li>
+          <li><a href="/transfer">Transfer</a></li>
+          <li><a href="/admin" class="active">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Admin</h1>
+        <p class="lead">Demo controls. Later labs can add a rate-setting screen.</p>
+      </div>
+
+      <p id="status" class="alert" hidden></p>
+
+      <div class="form-grid">
+        <div class="card">
+          <h2>Apply interest</h2>
+          <p>Adds 5% once to every savings account with a positive balance. Checking accounts do not change.</p>
+          <button type="button" id="interest" class="btn">Apply 5% interest</button>
+        </div>
+        <div class="card">
+          <h2>Reload seed data</h2>
+          <p>Replaces all accounts with the list in <code>data/accounts.txt</code>.</p>
+          <button type="button" id="reload" class="btn btn-outline">Reload accounts</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <p><strong>Casco Bay High School</strong></p>
+        <p><a href="https://cbhsstem.org">cbhsstem.org</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/format.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    var status = document.getElementById("status");
+
+    document.getElementById("interest").addEventListener("click", async function () {
+      try {
+        var result = await apiPost("/api/interest", {});
+        if (result.ok === false) {
+          showMessage(status, result.error, true);
+          return;
+        }
+        showMessage(status, "Interest applied to " + result.updated + " savings account(s).", false);
+      } catch (err) {
+        showMessage(status, err.message, true);
+      }
+    });
+
+    document.getElementById("reload").addEventListener("click", async function () {
+      try {
+        var result = await apiPost("/api/reload", {});
+        if (result.ok === false) {
+          showMessage(status, result.error, true);
+          return;
+        }
+        showMessage(status, "Reloaded " + result.accountCount + " accounts from the seed file.", false);
+      } catch (err) {
+        showMessage(status, err.message, true);
+      }
+    });
+  </script>
+</body>
+</html>

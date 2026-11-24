@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transfer — CBHS Bank</title>
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo-link">
+        <img src="/images/casco-bay-logo.png" alt="Casco Bay High School logo">
+        <div class="logo-text">
+          Casco Bay High School
+          <span>Bank</span>
+        </div>
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/accounts">Accounts</a></li>
+          <li><a href="/new-account">Open account</a></li>
+          <li><a href="/transfer" class="active">Transfer</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Transfer</h1>
+        <p class="lead">Move money from one account to another.</p>
+      </div>
+
+      <p id="status" class="alert" hidden></p>
+
+      <form id="form" class="card form-narrow">
+        <label for="fromNumber">From account number</label>
+        <input id="fromNumber" type="number" required>
+
+        <label for="toNumber">To account number</label>
+        <input id="toNumber" type="number" required>
+
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" min="0.01" step="0.01" required>
+
+        <label for="note">Note (optional)</label>
+        <input id="note" type="text">
+
+        <button type="submit" class="btn">Transfer</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <p><strong>Casco Bay High School</strong></p>
+        <p><a href="https://cbhsstem.org">cbhsstem.org</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/format.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById("form").addEventListener("submit", async function (event) {
+      event.preventDefault();
+      var status = document.getElementById("status");
+      try {
+        var result = await apiPost("/api/transfer", {
+          fromNumber: Number(document.getElementById("fromNumber").value),
+          toNumber: Number(document.getElementById("toNumber").value),
+          amount: Number(document.getElementById("amount").value),
+          note: document.getElementById("note").value
+        });
+        if (result.ok === false) {
+          showMessage(status, result.error, true);
+          return;
+        }
+        showMessage(status, "Transfer complete.", false);
+        document.getElementById("form").reset();
+      } catch (err) {
+        showMessage(status, err.message, true);
+      }
+    });
+  </script>
+</body>
+</html>

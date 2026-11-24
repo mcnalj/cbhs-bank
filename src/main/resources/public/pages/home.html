@@ -17,6 +17,15 @@
           <span>Bank</span>
         </div>
       </a>
+      <nav class="main-nav" aria-label="Main">
+        <ul>
+          <li><a href="/" class="active">Home</a></li>
+          <li><a href="/accounts">Accounts</a></li>
+          <li><a href="/new-account">Open account</a></li>
+          <li><a href="/transfer">Transfer</a></li>
+          <li><a href="/admin">Admin</a></li>
+        </ul>
+      </nav>
     </div>
   </header>
 
@@ -24,13 +33,32 @@
     <div class="container">
       <div class="page-header">
         <h1>CBHS Bank</h1>
-        <p class="lead">A student-developed banking simulation application.</p>
+        <p class="lead">A student-developed banking simulation. Not a real bank.</p>
       </div>
-      <div class="scaffold-message">
-        <h2>Under development</h2>
-        <p>This application is part of the CBHS STEM Sandbox. Students will build it in a later unit.</p>
-        <p><a href="https://cbhsstem.org" class="btn">Back to CBHS STEM</a></p>
+
+      <p id="status" class="alert" hidden></p>
+
+      <div id="stats" class="stats-grid">
+        <div class="stat-card">
+          <h2>Accounts</h2>
+          <p class="stat-value" id="account-count">—</p>
+        </div>
+        <div class="stat-card">
+          <h2>Total assets</h2>
+          <p class="stat-value" id="total-assets">—</p>
+        </div>
+        <div class="stat-card">
+          <h2>Average balance</h2>
+          <p class="stat-value" id="average-balance">—</p>
+        </div>
       </div>
+
+      <p id="empty-note" class="note" hidden>No accounts yet. Open an account or reload the seed file on the Admin page.</p>
+
+      <p>
+        <a href="/accounts" class="btn">View accounts</a>
+        <a href="/new-account" class="btn btn-outline">Open account</a>
+      </p>
     </div>
   </main>
 
@@ -42,5 +70,22 @@
       </div>
     </div>
   </footer>
+
+  <script src="/js/format.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    async function loadStats() {
+      try {
+        var data = await apiGet("/api/stats");
+        document.getElementById("account-count").textContent = data.accountCount;
+        document.getElementById("total-assets").textContent = money(data.totalAssets);
+        document.getElementById("average-balance").textContent = money(data.averageBalance);
+        document.getElementById("empty-note").hidden = data.accountCount !== 0;
+      } catch (err) {
+        showMessage(document.getElementById("status"), err.message, true);
+      }
+    }
+    loadStats();
+  </script>
 </body>
 </html>

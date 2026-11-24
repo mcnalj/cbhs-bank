@@ -1,0 +1,6 @@
+1001,Robotics Club,checking,250.00
+1002,Robotics Club,savings,900.00
+1003,Maya Patel,checking,157.50
+1004,Jordan Lee,checking,80.00
+1005,Jordan Lee,savings,20.00
+1006,School Store,checking,430.25
